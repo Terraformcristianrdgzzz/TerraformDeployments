@@ -1,0 +1,10 @@
+resource_group_name       = "rg-terraformdeployments-stage"
+location                  = "East US"
+vnet_name                 = "vnet-stage"
+vnet_address_space        = ["10.10.0.0/16"]
+subnet_name               = "snet-web"
+subnet_prefixes           = ["10.10.1.0/24"]
+vm_name                   = "vm-web-stage"
+admin_username            = "azureuser"
+ssh_source_address_prefix = null
+os_disk_size_gb           = 30

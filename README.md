@@ -18,8 +18,8 @@ The project is split into four repositories:
 | Repository | Responsibility |
 | --- | --- |
 | `TerraformDeployments` | Main repository. Holds the environment-specific Terraform configurations for `stage` and `prod`. |
-| [`terraform-module-azurerm-network`](https://github.com/cristianrdgzzz/terraform-module-azurerm-network) | Reusable Azure network module. |
-| [`terraform-module-azurerm-linux-webserver`](https://github.com/cristianrdgzzz/terraform-module-azurerm-linux-webserver) | Reusable Linux VM, public IP, NSG, and Apache example module. |
+| [`terraform-module-azurerm-network`](https://github.com/Terraformcristianrdgzzz/terraform-module-azurerm-network) | Reusable Azure network module. |
+| [`terraform-module-azurerm-linux-webserver`](https://github.com/Terraformcristianrdgzzz/terraform-module-azurerm-linux-webserver) | Reusable Linux VM, public IP, NSG, and Apache example module. |
 | `terraform-azure-deployment-template` | GitHub template repository with a small example configuration that composes the two modules. |
 
 The template repository name is still provisional. Module source URLs must use a version tag that exists in the corresponding repository.
@@ -44,23 +44,25 @@ Each environment is a separate Terraform root configuration with its own remote 
 
 ## Module versioning
 
-Deployment configurations should reference explicit module versions (Git tags), rather than a moving branch. For example, after a module repository publishes a `v1.0.0` tag:
+Deployment configurations reference explicit module versions (Git tags), rather than a moving branch. Both modules currently publish `v0.1.0`:
 
 ```hcl
 module "network" {
-  source = "git::https://github.com/cristianrdgzzz/terraform-module-azurerm-network.git?ref=v0.1.0"
+  source = "git::https://github.com/Terraformcristianrdgzzz/terraform-module-azurerm-network.git?ref=v0.1.0"
 }
 ```
 
-The tag is an example and must be created in the module repository before using it. The module repository is being implemented and does not yet have a published release.
+The stage deployment also pins the web server module to its `v0.1.0` tag.
 
 ## Azure and GitHub authentication
 
-GitHub Actions is intended to authenticate to Azure using Microsoft Entra workload identity federation (OIDC), without a long-lived Azure client secret. The federated credential is configured to trust the `stage` GitHub Environment. The workflow and end-to-end authentication still need to be implemented and verified.
+GitHub Actions authenticates to Azure using Microsoft Entra workload identity federation (OIDC), without a long-lived Azure client secret. The `Terraform Stage Plan` workflow is manually triggered and runs Terraform formatting, initialization, validation, and plan; it does not apply changes.
+
+Set the `ADMIN_SSH_PUBLIC_KEY` variable in the GitHub `stage` environment to the VM administrator's public SSH key. This is a public key, not a private key. The workflow also expects `AZURE_CLIENT_ID`, `AZURE_TENANT_ID`, and `AZURE_SUBSCRIPTION_ID` environment variables for the existing federated identity.
 
 The stage identity should receive only the permissions required for the resources it manages, scoped to the stage resource group and the state container. Production should use a separate GitHub Environment and an appropriately scoped identity and permissions before production deployment is enabled.
 
-The Azure subscription, resource groups, app registration, federated credential, and some role assignments have been configured manually for learning. Review their actual settings before running Terraform; this README does not certify that OIDC or remote state access is working.
+The Azure subscription, resource groups, app registration, federated credential, and some role assignments have been configured manually for learning. OIDC sign-in has been tested. Remote state access and the identity's permissions to plan and create the configured resources still need verification before deployment.
 
 ## Cost and security notes
 
@@ -70,14 +72,10 @@ The Azure subscription, resource groups, app registration, federated credential,
 - Do not commit credentials, Terraform state, plan files, or local variable files containing sensitive values.
 - A VM that is no longer needed should be deallocated or removed, and its related billable resources reviewed.
 
-## Planned implementation order
+## Deployment status
 
-1. Create and implement the network module repository.
-2. Create and implement the Linux web server module repository.
-3. Create a GitHub template repository that composes the published module versions.
-4. Add the `stage` configuration in this repository and validate OIDC and remote state access.
-5. Add `prod` only after the stage deployment and its cost/security settings are verified.
-
-## Status
-
-The repository is being built incrementally. The module code, template, deployment workflow, and end-to-end OIDC validation are not yet complete.
+- The `stage` configuration composes the pinned network and web server modules in `live/stage/webserver`.
+- Terraform state is configured to use the Azure Blob backend with OIDC and Azure AD authentication.
+- The workflow only creates a plan; it does not deploy infrastructure.
+- Verify remote backend access, Azure RBAC permissions, and VM size availability/cost before considering an apply.
+- Production and the GitHub template are not yet implemented.
