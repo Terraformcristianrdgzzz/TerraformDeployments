@@ -56,9 +56,9 @@ The stage deployment also pins the web server module to its `v0.1.0` tag.
 
 ## Azure and GitHub authentication
 
-GitHub Actions authenticates to Azure using Microsoft Entra workload identity federation (OIDC), without a long-lived Azure client secret. The `Terraform Stage Plan` workflow is manually triggered and runs Terraform formatting, initialization, validation, and plan; it does not apply changes.
+GitHub Actions authenticates to Azure using Microsoft Entra workload identity federation (OIDC), without a long-lived Azure client secret. The manually triggered `Terraform Stage Plan` workflow always runs formatting, initialization, and validation; initialization checks remote backend access. Creating a VM plan is an optional manual input and does not apply changes.
 
-Set the `ADMIN_SSH_PUBLIC_KEY` variable in the GitHub `stage` environment to the VM administrator's public SSH key. This is a public key, not a private key. The workflow also expects `AZURE_CLIENT_ID`, `AZURE_TENANT_ID`, and `AZURE_SUBSCRIPTION_ID` environment variables for the existing federated identity.
+The optional VM plan requires `ADMIN_SSH_PUBLIC_KEY` in the GitHub `stage` environment. It is the VM administrator's public key, not a private key, and is only passed into the VM configuration; the NSG does not allow SSH ingress by default. The workflow also expects `AZURE_CLIENT_ID`, `AZURE_TENANT_ID`, and `AZURE_SUBSCRIPTION_ID` environment variables for the existing federated identity.
 
 The stage identity should receive only the permissions required for the resources it manages, scoped to the stage resource group and the state container. Production should use a separate GitHub Environment and an appropriately scoped identity and permissions before production deployment is enabled.
 
