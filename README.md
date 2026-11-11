@@ -62,7 +62,7 @@ The optional VM plan requires `ADMIN_SSH_PUBLIC_KEY` in the GitHub `stage` envir
 
 The stage identity should receive only the permissions required for the resources it manages, scoped to the stage resource group and the state container. Production should use a separate GitHub Environment and an appropriately scoped identity and permissions before production deployment is enabled.
 
-The Azure subscription, resource groups, app registration, federated credential, and some role assignments have been configured manually for learning. OIDC sign-in has been tested. Remote state access and the identity's permissions to plan and create the configured resources still need verification before deployment.
+The stage AzureRM provider disables automatic subscription-wide resource provider registration. Before planning or applying, an administrator must ensure `Microsoft.Network` and `Microsoft.Compute` are registered in the subscription. OIDC sign-in and remote state locking have been verified; the identity's permissions to read and create the configured resources still need verification before deployment.
 
 ## Cost and security notes
 
