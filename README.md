@@ -1,6 +1,6 @@
 # TerraformDeployments
 
-Terraform configurations for deploying a small Azure web application in isolated `stage` and `prod` environments. The infrastructure is assembled from reusable modules maintained in separate GitHub repositories.
+Terraform configuration for the single `stage` Azure deployment used by this project. The infrastructure is assembled from reusable modules maintained in separate GitHub repositories.
 
 The initial example will create:
 
@@ -17,14 +17,12 @@ The project is split into four repositories:
 
 | Repository | Responsibility |
 | --- | --- |
-| `TerraformDeployments` | Main repository. Holds the environment-specific Terraform configurations for `stage` and `prod`. |
+| `TerraformDeployments` | The real `stage` deployment configuration for this project. |
 | [`terraform-module-azurerm-network`](https://github.com/Terraformcristianrdgzzz/terraform-module-azurerm-network) | Reusable Azure network module. |
 | [`terraform-module-azurerm-linux-webserver`](https://github.com/Terraformcristianrdgzzz/terraform-module-azurerm-linux-webserver) | Reusable Linux VM, public IP, NSG, and Apache example module. |
-| `terraform-azure-deployment-template` | GitHub template repository with a small example configuration that composes the two modules. |
+| `terraform-azure-deployment-template` | Planned reusable GitHub template that composes the two modules for new projects. |
 
-The template repository name is still provisional. Module source URLs must use a version tag that exists in the corresponding repository.
-
-The GitHub template is a starting point for creating new deployment repositories. It copies its files when a new repository is created; it is not itself a runtime dependency of `TerraformDeployments`. Terraform will download the modules directly from their repositories.
+The GitHub template is a starting point for creating new deployment repositories. It copies its files when a new repository is created; it is not a runtime dependency of this deployment. Terraform downloads the modules directly from their repositories.
 
 ## Repository layout
 
@@ -40,7 +38,7 @@ The GitHub template is a starting point for creating new deployment repositories
 └── README.md
 ```
 
-Each environment is a separate Terraform root configuration with its own remote state key. The `stage` and `prod` configurations can call the same module versions with different inputs.
+The `stage` directory is the only deployment in this repository. It has its own remote Terraform state and calls the same reusable modules that the template uses.
 
 ## Module versioning
 
@@ -60,7 +58,7 @@ GitHub Actions authenticates to Azure using Microsoft Entra workload identity fe
 
 The optional VM plan requires `ADMIN_SSH_PUBLIC_KEY` in the GitHub `stage` environment. It is the VM administrator's public key, not a private key, and is only passed into the VM configuration; the NSG does not allow SSH ingress by default. The workflow also expects `AZURE_CLIENT_ID`, `AZURE_TENANT_ID`, and `AZURE_SUBSCRIPTION_ID` environment variables for the existing federated identity.
 
-The stage identity should receive only the permissions required for the resources it manages, scoped to the stage resource group and the state container. Production should use a separate GitHub Environment and an appropriately scoped identity and permissions before production deployment is enabled.
+The stage identity should receive only the permissions required for the resources it manages, scoped to the stage resource group and the state container. The template's users must configure their own GitHub Environment, OIDC trust, state backend, and appropriately scoped Azure roles.
 
 The stage AzureRM provider disables automatic subscription-wide resource provider registration. Before planning or applying, an administrator must ensure `Microsoft.Network` and `Microsoft.Compute` are registered in the subscription. OIDC sign-in and remote state locking have been verified; the identity's permissions to read and create the configured resources still need verification before deployment.
 
@@ -78,4 +76,5 @@ The stage AzureRM provider disables automatic subscription-wide resource provide
 - Terraform state is configured to use the Azure Blob backend with OIDC and Azure AD authentication.
 - The workflow only creates a plan; it does not deploy infrastructure.
 - Verify remote backend access, Azure RBAC permissions, and VM size availability/cost before considering an apply.
-- Production and the GitHub template are not yet implemented.
+- `stage` is the only real deployment; no `prod` environment is planned.
+- The reusable template is being prepared separately in `terraform-azure-deployment-template`; it has not been published yet.
