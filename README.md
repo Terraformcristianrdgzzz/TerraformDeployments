@@ -20,7 +20,7 @@ The project is split into four repositories:
 | `TerraformDeployments` | The real `stage` deployment configuration for this project. |
 | [`terraform-module-azurerm-network`](https://github.com/Terraformcristianrdgzzz/terraform-module-azurerm-network) | Reusable Azure network module. |
 | [`terraform-module-azurerm-linux-webserver`](https://github.com/Terraformcristianrdgzzz/terraform-module-azurerm-linux-webserver) | Reusable Linux VM, public IP, NSG, and Apache example module. |
-| `terraform-azure-deployment-template` | Planned reusable GitHub template that composes the two modules for new projects. |
+| [`terraform-azure-deployment-template`](https://github.com/Terraformcristianrdgzzz/terraform-azure-deployment-template) | Reusable GitHub template that composes the two modules for new projects. |
 
 The GitHub template is a starting point for creating new deployment repositories. It copies its files when a new repository is created; it is not a runtime dependency of this deployment. Terraform downloads the modules directly from their repositories.
 
@@ -77,4 +77,4 @@ The stage AzureRM provider disables automatic subscription-wide resource provide
 - The workflow only creates a plan; it does not deploy infrastructure.
 - Verify remote backend access, Azure RBAC permissions, and VM size availability/cost before considering an apply.
 - `stage` is the only real deployment; no `prod` environment is planned.
-- The reusable template is being prepared separately in `terraform-azure-deployment-template`; it has not been published yet.
+- The reusable template is published separately in [`terraform-azure-deployment-template`](https://github.com/Terraformcristianrdgzzz/terraform-azure-deployment-template).
