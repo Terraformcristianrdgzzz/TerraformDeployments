@@ -42,15 +42,15 @@ The `stage` directory is the only deployment in this repository. It has its own 
 
 ## Module versioning
 
-Deployment configurations reference explicit module versions (Git tags), rather than a moving branch. Both modules currently publish `v0.1.0`:
+Deployment configurations reference explicit module versions (Git tags), rather than a moving branch. Both modules currently publish `v0.2.0`:
 
 ```hcl
 module "network" {
-  source = "git::https://github.com/Terraformcristianrdgzzz/terraform-module-azurerm-network.git?ref=v0.1.0"
+  source = "git::https://github.com/Terraformcristianrdgzzz/terraform-module-azurerm-network.git?ref=v0.2.0"
 }
 ```
 
-The stage deployment also pins the web server module to its `v0.1.0` tag.
+The stage deployment also pins the web server module to its `v0.2.0` tag.
 
 ## Azure and GitHub authentication
 
