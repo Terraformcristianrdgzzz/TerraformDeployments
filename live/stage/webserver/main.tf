@@ -16,7 +16,7 @@ module "network" {
 }
 
 module "webserver" {
-  source = "git::https://github.com/Terraformcristianrdgzzz/terraform-module-azurerm-linux-webserver.git?ref=v0.2.0"
+  source = "git::https://github.com/Terraformcristianrdgzzz/terraform-module-azurerm-linux-webserver.git?ref=v0.2.1"
 
   resource_group_name       = var.resource_group_name
   location                  = var.location
